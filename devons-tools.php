@@ -1,45 +1,60 @@
 <?php
 if ( ! defined( 'WPINC' ) ) { die; }
 /*
- * Plugin Name:       Devons Tools - Post-Type API
+ * Plugin Name:       SFT Scrolls CPT
  * Plugin URI:        
- * Description:       This is the Core for Devons Tools Framework
- * Version:           v0.9.5
+ * Description:       This is for tracking and posting SFT Scrolls.
+ * Version:           v1.0.0
  * Author:            Devon Godfrey
  * Author URI:        http://playfreygames.net
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+GitHub Plugin URI: https://github.com/devonhg/sft-scrolls-plugin
+GitHub Branch:     master
 
 	*IMPORTANT*
-	do a "find/replace" accross the directory for "MYPLUGIN" and replace
+	do a "find/replace" accross the directory for "SFT_PLUG" and replace
 	with your plugin name. 
 
-	Plugin slug: MYPLUGIN
+	Plugin slug: SFT_PLUG
 
 */
 
 //Include the core class of the post type api
     include_once('pt-api/class-core.php');
-    register_activation_hook( __FILE__, 'MYPLUGIN_ptapi_activate' );
+    register_activation_hook( __FILE__, 'SFT_PLUG_ptapi_activate' );
 
 //Create Post-Type Object
-    $pt_books = new MYPLUGIN_post_type( "Books", "Book", "This post-type is for books." ); 
+    $pt_scroll = new SFT_PLUG_post_type( "Scrolls", "Scroll", "This post-type is for scroll." ); 
 
 //Register Taxonomies
-    $pt_books->reg_tax("Genres", "Genre" );
-    $pt_books->reg_tax("Authors", "Author" );
+    $pt_scroll->reg_tax("Categories", "Category" );
 
 //Modify Hooks
-    $pt_books->add_hook_single( array("MYPLUGIN_pt_pcs",'pc_media') );
+    $pt_scroll->add_hook_single( "sft_scroll_download" );
 
 //Add Meta
-    $pt_books->reg_meta('Price', 'The Cost of the Book', true);
-    $pt_books->reg_meta('Color1', 'Color', true, 'color');
-    $pt_books->reg_meta('Color2', 'Color2', true, 'color');
-    $pt_books->reg_meta('Number', 'Input a Number', true, 'number');
-    $pt_books->reg_meta('Link', 'Input a Link', true, 'link');
-    $pt_books->reg_meta('Media', 'Input media', true, 'media');
+    $scroll_file = $pt_scroll->reg_meta('Scroll PDF', 'Select the pdf file for the scroll here.', true, 'media');
 
-//Movies Post-Type
-    $pt_movies = new MYPLUGIN_post_type( "Movies", "Movie", "This post-type is for books." ); 
-    $pt_movies->reg_tax("Genres", "Genre" );
+/*******************
+* Scrolls Download
+*******************/
+
+    function sft_scroll_download( $quer=null ){
+        $post = SFT_PLUG_func::get_post( $quer );
+        global $scroll_file;
+
+        $scroll_link = $scroll_file->get_val(); 
+
+        $o = ""; 
+
+        if( $scroll_link != "" || $scroll_link != null ){
+            $o .= "<div class='scroll-link'>";
+                $o .= "<a target='_blank' href='" . $scroll_link . "' title='Click to View Scroll'>";
+                    $o .= "View This Scroll"; 
+                $o .= "</a>";
+            $o .= "</div>";
+        }
+
+        echo $o; 
+    }
